@@ -1,16 +1,23 @@
 const { ApolloServer } = require('apollo-server');
 const { PrismaClient } = require('@prisma/client');
-const { getUserId } = require('./utils')
-const Query = require('./resolvers/Query')
-const Mutation = require('./resolvers/Mutations')
-const User = require('./resolvers/Users')
-const Link = require('./resolvers/Link')
+const { PubSub } = require('graphql-subscriptions');
+const { getUserId } = require('./utils');
+const Query = require('./resolvers/Query');
+const Mutation = require('./resolvers/Mutations');
+const User = require('./resolvers/Users');
+const Link = require('./resolvers/Link');
+const Subscription = require('./resolvers/Subscription');
+const Vote = require('./resolvers/Vote')
+
+const pubsub = new PubSub()
 
 const resolvers = {
     Query,
     Mutation,
+    Subscription,
     User,
-    Link
+    Link,
+    Vote
 }
 
 const fs = require('fs');
@@ -28,6 +35,7 @@ const server = new ApolloServer({
         return {
             ...req,
             prisma,
+            pubsub,
             userId:
                 req && req.headers.authorization
                     ? getUserId(req)
